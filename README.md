@@ -34,8 +34,10 @@ tgsort [file_or_directory|-] [flags]
 Flags:
   -d, --dry-run     Print a unified diff without modifying files; exits 1 if any file would change
   -r, --recursive   Recurse into subdirectories when a directory is given
-      --version     Print version and exit
+  -v, --version     Print version and exit
 ```
+
+> **Note:** `.hcl.json` files are not supported and will produce an error.
 
 ### Examples
 
@@ -73,7 +75,7 @@ sort_attributes_in = ["inputs"]
 | Field | Default | Description |
 |-------|---------|-------------|
 | `block_order` | `["terraform", "remote_state", "include", "locals", "generate", "dependency", "inputs"]` | Block types sorted in this order; types not listed sort alphabetically after |
-| `sort_attributes_in` | `["inputs"]` | Attribute keys inside these block types are also sorted |
+| `sort_attributes_in` | `["inputs"]` | Attribute keys inside these block bodies or attribute map literals are also sorted |
 
 ## How it works
 
