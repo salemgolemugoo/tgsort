@@ -11,7 +11,7 @@ import (
 	"github.com/salemgolemugoo/tgsort/internal/walker"
 )
 
-const version = "0.1.0"
+var version = "dev"
 
 var (
 	dryRun    bool
