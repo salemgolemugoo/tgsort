@@ -1,0 +1,13 @@
+.git
+.github
+.claude
+.editorconfig
+.gitignore
+.pre-commit-config.yaml
+.tool-versions
+docs
+chart
+testdata
+*.md
+LICENSE
+artifacthub-repo.yml
