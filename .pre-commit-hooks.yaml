@@ -1,0 +1,7 @@
+- id: tgsort
+  name: Sort Terragrunt HCL files
+  description: Sorts blocks and attributes in Terragrunt HCL files (like gofmt for Terragrunt).
+  language: golang
+  entry: tgsort
+  files: \.hcl$
+  exclude: \.hcl\.json$
