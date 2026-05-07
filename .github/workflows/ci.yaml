@@ -5,8 +5,18 @@ on:
     branches: [main]
     tags:
       - 'v*'
+    paths:
+      - '**/*.go'
+      - 'go.mod'
+      - 'go.sum'
+      - '.github/workflows/ci.yaml'
   pull_request:
     branches: [main]
+    paths:
+      - '**/*.go'
+      - 'go.mod'
+      - 'go.sum'
+      - '.github/workflows/ci.yaml'
 
 permissions:
   contents: read
