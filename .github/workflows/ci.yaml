@@ -15,12 +15,17 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
         with:
           go-version: '1.23'
       - name: Run tests
-        run: go test ./... -v -race -coverprofile=coverage.txt
+        run: go test -coverpkg=./... -coverprofile=coverage.txt -v -race ./internal/...
+      - name: Upload coverage
+        uses: codecov/codecov-action@v6
+        with:
+          files: coverage.txt
+          token: ${{ secrets.CODECOV_TOKEN }}
       - name: Build
         run: go build ./...
 
@@ -31,13 +36,13 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v6
         with:
           go-version: '1.23'
-      - uses: goreleaser/goreleaser-action@v6
+      - uses: goreleaser/goreleaser-action@v7
         with:
           distribution: goreleaser
           version: "~> v2"
