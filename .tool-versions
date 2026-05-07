@@ -1,4 +1,4 @@
-golang 1.23.0
+golang 1.26.3
 pre-commit 4.5.1
 github-cli 2.39.1
 goreleaser 2.1.0
