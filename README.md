@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/salemgolemugoo/tgsort/actions/workflows/ci.yaml/badge.svg)](https://github.com/salemgolemugoo/tgsort/actions/workflows/ci.yaml)
 [![Latest Release](https://img.shields.io/github/v/release/salemgolemugoo/tgsort)](https://github.com/salemgolemugoo/tgsort/releases/latest)
-[![Go Version](https://img.shields.io/badge/go-1.23-blue)](https://go.dev/doc/go1.23)
+[![Go Version](https://img.shields.io/badge/go-1.26-blue)](https://go.dev/doc/go1.26)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 
 `tgsort` sorts blocks and attributes in Terragrunt HCL files — like `gofmt`, but for Terragrunt configuration. It rewrites files in-place so your `terragrunt.hcl` always has a consistent, reviewable layout regardless of who wrote it.
