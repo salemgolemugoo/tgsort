@@ -69,6 +69,9 @@ func run(cmd *cobra.Command, args []string) error {
 	}
 
 	if len(args) == 1 && args[0] == "-" {
+		if recursive {
+			return fmt.Errorf("cannot use --recursive with stdin (-)")
+		}
 		return w.ProcessStdin(os.Stdin, os.Stdout)
 	}
 
