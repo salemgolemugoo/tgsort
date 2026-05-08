@@ -19,10 +19,10 @@ var (
 )
 
 var rootCmd = &cobra.Command{
-	Use:     "tgsort [file_or_directory|-]",
+	Use:     "tgsort [file_or_directory...|-]",
 	Short:   "Sort blocks and attributes in Terragrunt HCL files",
 	Version: version,
-	Args:    cobra.MaximumNArgs(1),
+	Args:    cobra.ArbitraryArgs,
 	RunE:    run,
 }
 
@@ -39,13 +39,10 @@ func init() {
 }
 
 func run(cmd *cobra.Command, args []string) error {
-	target := ""
-	if len(args) == 1 {
-		target = args[0]
-	}
-
-	if target == "-" && recursive {
-		return fmt.Errorf("cannot use --recursive with stdin (-)")
+	for _, a := range args {
+		if a == "-" && len(args) > 1 {
+			return fmt.Errorf("cannot use stdin (-) with other arguments")
+		}
 	}
 
 	wd, err := os.Getwd()
@@ -55,17 +52,12 @@ func run(cmd *cobra.Command, args []string) error {
 
 	cfg, err := config.Load(wd)
 	if err != nil {
-		return err // config error → non-zero exit
+		return err
 	}
 
 	w := walker.New(cfg, dryRun)
 
-	switch {
-	case target == "-":
-		return w.ProcessStdin(os.Stdin, os.Stdout)
-
-	case target == "":
-		// No argument: sort the current directory (non-recursive by default).
+	if len(args) == 0 {
 		hasChanges, err := w.ProcessDir(wd, recursive)
 		if err != nil {
 			return err
@@ -73,33 +65,42 @@ func run(cmd *cobra.Command, args []string) error {
 		if dryRun && hasChanges {
 			os.Exit(1)
 		}
+		return nil
+	}
 
-	default:
+	if len(args) == 1 && args[0] == "-" {
+		return w.ProcessStdin(os.Stdin, os.Stdout)
+	}
+
+	hasChanges := false
+	for _, target := range args {
+		if strings.HasSuffix(target, ".hcl.json") {
+			return fmt.Errorf("%s: .hcl.json files are not supported", target)
+		}
 		info, err := os.Stat(target)
 		if err != nil {
 			return fmt.Errorf("%s: %w", target, err)
 		}
 		if info.IsDir() {
-			hasChanges, err := w.ProcessDir(target, recursive)
+			changed, err := w.ProcessDir(target, recursive)
 			if err != nil {
 				return err
 			}
-			if dryRun && hasChanges {
-				os.Exit(1)
+			if changed {
+				hasChanges = true
 			}
 		} else {
-			if strings.HasSuffix(target, ".hcl.json") {
-				return fmt.Errorf("%s: .hcl.json files are not supported", target)
-			}
 			changed, err := w.ProcessFile(target)
 			if err != nil {
 				return err
 			}
-			if dryRun && changed {
-				os.Exit(1)
+			if changed {
+				hasChanges = true
 			}
 		}
 	}
-
+	if dryRun && hasChanges {
+		os.Exit(1)
+	}
 	return nil
 }

@@ -149,3 +149,52 @@ func TestIntegration_Stdin(t *testing.T) {
 		t.Errorf("stdin output wrong:\ngot:\n%q\nwant:\n%q", out, want)
 	}
 }
+
+func TestIntegration_MultipleFiles(t *testing.T) {
+	bin := getBinary(t)
+
+	unsorted := "inputs = {}\n\nterraform {\n  source = \".\"\n}\n"
+	sorted := "terraform {\n  source = \".\"\n}\n\ninputs = {}\n"
+
+	dir := t.TempDir()
+	file1 := filepath.Join(dir, "a.hcl")
+	file2 := filepath.Join(dir, "b.hcl")
+	for _, p := range []string{file1, file2} {
+		if err := os.WriteFile(p, []byte(unsorted), 0644); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	cmd := exec.Command(bin, file1, file2)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	if err := cmd.Run(); err != nil {
+		t.Fatalf("tgsort failed: %v", err)
+	}
+
+	for _, p := range []string{file1, file2} {
+		got, err := os.ReadFile(p)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if string(got) != sorted {
+			t.Errorf("%s: got %q, want %q", p, got, sorted)
+		}
+	}
+}
+
+func TestIntegration_StdinWithOtherArgs_Fails(t *testing.T) {
+	bin := getBinary(t)
+
+	dir := t.TempDir()
+	dummy := filepath.Join(dir, "dummy.hcl")
+	if err := os.WriteFile(dummy, []byte("inputs = {}\n"), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	cmd := exec.Command(bin, "-", dummy)
+	cmd.Stdin = strings.NewReader("inputs = {}\n")
+	if err := cmd.Run(); err == nil {
+		t.Error("expected non-zero exit when combining stdin (-) with other args")
+	}
+}
